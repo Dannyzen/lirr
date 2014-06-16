@@ -64,7 +64,9 @@ def getDepartureTime(src_station,dest_station):
                                      + str(datetime.datetime.time(datetime.datetime.now()).minute)
                                      + "&datoggle=d"))
 
-# Todo:
+# Todo: Figure out how to handle that terrible response from above, and make that funtion less of a tragedy
+# Todo: Add parameterization to runner
+
 
 # lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
 
