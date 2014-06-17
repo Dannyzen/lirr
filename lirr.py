@@ -1,8 +1,10 @@
+#!/usr/bin/python
 from __future__ import print_function
 import urllib2
 import json
 import ast
 import datetime
+from optparse import OptionParser
 
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
@@ -37,7 +39,7 @@ def getStationId(station):
 
 
 
-def stationStringCheck(src_station,dest_station):
+def stationStringCheck(src_station, dest_station):
     if len(src_station) < 3:
         return "Please provide a station name with > 3 characters, you lazy bastard"
     if len(dest_station) < 3:
@@ -65,11 +67,15 @@ def getDepartureTime(src_station,dest_station):
                                      + "&datoggle=d"))
 
 # Todo: Figure out how to handle that terrible response from above, and make that funtion less of a tragedy
-# Todo: Add parameterization to runner
 
 
 # lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
 
 # station_id = getStationId('hewlett')
+parser = OptionParser()
+parser.add_option("-s", "--source", dest="source", help="source station", default="")
+parser.add_option("-d", "--dest", dest="dest", help="destination station", default="")
 
-print(stationStringCheck('penn', 'hicksville'))
+(options, args) = parser.parse_args()
+
+print(stationStringCheck(options.source, options.dest))
