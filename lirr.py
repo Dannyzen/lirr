@@ -1,4 +1,14 @@
 #!/usr/bin/python
+# Script fully supports use cases where source and destination are on the same train line
+# Usage: python lirr.py -s SOURCE -d DESTINATION
+# Ex: python lirr.py -s penn -d babylon
+# Output:
+# 4 most recent:
+#  departure times
+#  corresponding arrival times
+#  corresponding duration times
+# Written by: @dannyzen
+
 from __future__ import print_function
 import urllib2
 import json
@@ -27,34 +37,42 @@ def writeStationList():
 
 def getStationId(station):
     # load stations in as a dict from stations.txt
+    # Ex: {"Penn Station":"NYK"}
     stations = {}
     stations = ast.literal_eval(open('stations.txt').read())
-    # lowercase all keys in stations
+    # lowercase all station names in stations
     stations = dict((k.lower(), v) for k, v in stations.iteritems())
-    # now try to match the station to the dict's keys
+    # try to match the station to the dict's keys
+    # TODO: Need to do better catching for scenarios where:
+    #   1. Station matches multiple station names
+    #   2. Station is straight up wrong
     try:
         value = next(v for (k,v) in stations.iteritems() if station in k)
         return(value)
     except:
         print("Tried to find the station. Couldn't. Blaming you.")
 
-
-
-def stationStringCheck(src_station, dest_station):
-    if len(src_station) < 3:
-        return "Please provide a station name with > 3 characters, you lazy bastard"
-    if len(dest_station) < 3:
-        return "Please provide a station name with > 3 characters, you lazy bastard"
+def stationStringSizeCheck(source, destination):
+    if len(source) < 3:
+        print("Please provide a source station name with > 3 characters")
+    if len(destination) < 3:
+        print("Please provide a destination name with > 3 characters")
     else:
-        return getFeed(src_station,dest_station)
+        return True
+    # else:
+    #     return getFeed(source,destination)
 
 
-def getFeed(src_station,dest_station):
+def getFeed(source,destination):
+    if not source:
+        print("source was fucked up")
+    if not destination:
+        print("destionat was fucked up")
     # this is a very ugly function, It is a tragedy to humans. I don't care. It works.
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/TrainTime?startsta="
-                                     + getStationId(src_station)
+                                     + getStationId(source)
                                      + "&endsta="
-                                     + getStationId(dest_station)
+                                     + getStationId(destination)
                                      + "&year="
                                      + str(datetime.date.today().year)
                                      + "&month="
@@ -66,6 +84,8 @@ def getFeed(src_station,dest_station):
                                      + "&minute="
                                      + str(datetime.datetime.time(datetime.datetime.now()).minute)
                                      + "&datoggle=d"))
+
+# def check
 
 def getDuration(feed):
     durations = []
@@ -95,9 +115,12 @@ def convertTimes(times):
 
 
 def getTrainTimes(source,destination):
-    print(convertTimes(getDepartureTimes(stationStringCheck(source, destination))))
-    print(convertTimes(getArrivalTimes(stationStringCheck(source, destination))))
-    print(getDuration(stationStringCheck(source, destination)))
+    print("Source departure times")
+    print(convertTimes(getDepartureTimes(getFeed(source, destination))))
+    print("Destination arrival times")
+    print(convertTimes(getArrivalTimes(getFeed(source, destination))))
+    print("Trip duration in minutes")
+    print(getDuration(getFeed(source, destination)))
 
 
 def main():
@@ -108,7 +131,8 @@ def main():
     parser.add_argument('-destination', metavar='-d', type=str, help='The train station you are ending your journey (Autocomplete requires 3 characters ore more)')
     options = parser.parse_args()
     if os.path.isfile('stations.txt'):
-        getTrainTimes(options.source,options.destination)
+        if stationStringSizeCheck(options.source,options.destination) == True:
+            getTrainTimes(options.source,options.destination)
     else:
         try:
             writeStationList()
@@ -121,11 +145,8 @@ def main():
 
 # lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
 
-# parser = OptionParser()
-# parser.add_option("-s", "--source", dest="source", help="source station", default="")
-# parser.add_option("-d", "--dest", dest="dest", help="destination station", default="")
-# (options, args) = parser.parse_args()
-#
+# TODO:
+# 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
 
 if __name__ == "__main__":
     main()
