@@ -87,14 +87,12 @@ def getArrivalTimes(feed):
     return departure_times
 
 def convertTimes(times):
-    times = []
+    new_times = []
     for time in times:
-        print(time)
-        d = datetime.datetime.strptime(time, "%H:%M")
-        print(d)
-        d.strftime("%I:%M %p")
-        times.append()
-    return times
+        d = datetime.datetime.strptime(time, "%H%M")
+        time = d.strftime("%I:%M %p")
+        new_times.append(time)
+    return new_times
 
 
 
@@ -104,15 +102,8 @@ def convertTimes(times):
 parser = OptionParser()
 parser.add_option("-s", "--source", dest="source", help="source station", default="")
 parser.add_option("-d", "--dest", dest="dest", help="destination station", default="")
-
 (options, args) = parser.parse_args()
 
-# pp.pprint(stationStringCheck(options.source, options.dest))
-data = stationStringCheck(options.source, options.dest)
-# print(data['TRIPS'][1])
-
-#V1
-print(getDepartureTimes(stationStringCheck(options.source, options.dest))))
-print(getArrivalTimes(stationStringCheck(options.source, options.dest)))
+print(convertTimes(getDepartureTimes(stationStringCheck(options.source, options.dest))))
+print(convertTimes(getArrivalTimes(stationStringCheck(options.source, options.dest))))
 print(getDuration(stationStringCheck(options.source, options.dest)))
-
