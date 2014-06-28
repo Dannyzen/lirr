@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # Script fully supports use cases where source and destination are on the same train line
+# Get Long Island Railroad departure, arrival and duration time.
 # Usage: python lirr.py -s SOURCE -d DESTINATION
 # Ex: python lirr.py -s penn -d babylon
 # Output:
