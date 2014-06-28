@@ -5,6 +5,8 @@ import json
 import ast
 import datetime
 from optparse import OptionParser
+import pprint
+
 
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
@@ -45,15 +47,15 @@ def stationStringCheck(src_station, dest_station):
     if len(dest_station) < 3:
         return "Please provide a station name with > 3 characters, you lazy bastard"
     else:
-        return getDepartureTime(src_station,dest_station)
+        return getFeed(src_station,dest_station)
 
 
-def getDepartureTime(src_station,dest_station):
+def getFeed(src_station,dest_station):
     # this is a very ugly function, It is a tragedy to humans. I don't care. It works.
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/TrainTime?startsta="
-                                     + getStationId("penn station")
+                                     + getStationId(src_station)
                                      + "&endsta="
-                                     + getStationId("hewlett")
+                                     + getStationId(dest_station)
                                      + "&year="
                                      + str(datetime.date.today().year)
                                      + "&month="
@@ -66,16 +68,51 @@ def getDepartureTime(src_station,dest_station):
                                      + str(datetime.datetime.time(datetime.datetime.now()).minute)
                                      + "&datoggle=d"))
 
-# Todo: Figure out how to handle that terrible response from above, and make that funtion less of a tragedy
+def getDuration(feed):
+    durations = []
+    for i in range (len(feed)):
+        durations.append(feed['TRIPS'][i]['DURATION'])
+    return durations
+
+def getDepartureTimes(feed):
+    departure_times = []
+    for i in range (len(feed)):
+        departure_times.append(feed['TRIPS'][i]['LEGS'][0]['DEPART_TIME'])
+    return departure_times
+
+def getArrivalTimes(feed):
+    departure_times = []
+    for i in range (len(feed)):
+        departure_times.append(feed['TRIPS'][i]['LEGS'][0]['ARRIVE_TIME'])
+    return departure_times
+
+def convertTimes(times):
+    times = []
+    for time in times:
+        print(time)
+        d = datetime.datetime.strptime(time, "%H:%M")
+        print(d)
+        d.strftime("%I:%M %p")
+        times.append()
+    return times
+
+
 
 
 # lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
 
-# station_id = getStationId('hewlett')
 parser = OptionParser()
 parser.add_option("-s", "--source", dest="source", help="source station", default="")
 parser.add_option("-d", "--dest", dest="dest", help="destination station", default="")
 
 (options, args) = parser.parse_args()
 
-print(stationStringCheck(options.source, options.dest))
+# pp.pprint(stationStringCheck(options.source, options.dest))
+data = stationStringCheck(options.source, options.dest)
+# print(data['TRIPS'][1])
+
+#V1
+print(getDepartureTimes(stationStringCheck(options.source, options.dest))))
+print(getArrivalTimes(stationStringCheck(options.source, options.dest)))
+print(getDuration(stationStringCheck(options.source, options.dest)))
+
