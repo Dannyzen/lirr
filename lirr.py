@@ -4,9 +4,8 @@ import urllib2
 import json
 import ast
 import datetime
-from optparse import OptionParser
-import pprint
-
+import argparse
+import os.path
 
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
@@ -95,15 +94,38 @@ def convertTimes(times):
     return new_times
 
 
+def getTrainTimes(source,destination):
+    print(convertTimes(getDepartureTimes(stationStringCheck(source, destination))))
+    print(convertTimes(getArrivalTimes(stationStringCheck(source, destination))))
+    print(getDuration(stationStringCheck(source, destination)))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Get Long Island Railroad departure, arrival and duration time."
+    )
+    parser.add_argument('-source', metavar='-s', type=str, help='The train station you are starting your journey from (Autocomplete requires 3 characters ore more)' )
+    parser.add_argument('-destination', metavar='-d', type=str, help='The train station you are ending your journey (Autocomplete requires 3 characters ore more)')
+    options = parser.parse_args()
+    if os.path.isfile('stations.txt'):
+        getTrainTimes(options.source,options.destination)
+    else:
+        try:
+            writeStationList()
+        except IOError:
+            print("Stations.txt does not exist, we tried to write it to this folder. We couldn't.")
+            raise
+        getTrainTimes(options.source,options.destination)
+
 
 
 # lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
 
-parser = OptionParser()
-parser.add_option("-s", "--source", dest="source", help="source station", default="")
-parser.add_option("-d", "--dest", dest="dest", help="destination station", default="")
-(options, args) = parser.parse_args()
+# parser = OptionParser()
+# parser.add_option("-s", "--source", dest="source", help="source station", default="")
+# parser.add_option("-d", "--dest", dest="dest", help="destination station", default="")
+# (options, args) = parser.parse_args()
+#
 
-print(convertTimes(getDepartureTimes(stationStringCheck(options.source, options.dest))))
-print(convertTimes(getArrivalTimes(stationStringCheck(options.source, options.dest))))
-print(getDuration(stationStringCheck(options.source, options.dest)))
+if __name__ == "__main__":
+    main()
