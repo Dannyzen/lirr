@@ -7,7 +7,7 @@
 #  departure times
 #  corresponding arrival times
 #  corresponding duration times
-# Written by: @dannyzen
+# Written by: @dannyzen & jcrivera
 
 from __future__ import print_function
 import urllib2
