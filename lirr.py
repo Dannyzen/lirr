@@ -60,9 +60,6 @@ def stationStringSizeCheck(source, destination):
         print("Please provide a destination name with > 3 characters")
     else:
         return True
-    # else:
-    #     return getFeed(source,destination)
-
 
 def getFeed(source,destination):
     if not source:
@@ -70,7 +67,8 @@ def getFeed(source,destination):
     if not destination:
         print("destionat was fucked up")
     # this is a very ugly function, It is a tragedy to humans. I don't care. It works.
-    return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/TrainTime?startsta="
+    global feed
+    feed = json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/TrainTime?startsta="
                                      + getStationId(source)
                                      + "&endsta="
                                      + getStationId(destination)
@@ -85,7 +83,7 @@ def getFeed(source,destination):
                                      + "&minute="
                                      + str(datetime.datetime.time(datetime.datetime.now()).minute)
                                      + "&datoggle=d"))
-
+    return feed
 # def check
 
 def getDuration(feed):
@@ -117,11 +115,11 @@ def convertTimes(times):
 
 def getTrainTimes(source,destination):
     print("Source departure times")
-    print(convertTimes(getDepartureTimes(getFeed(source, destination))))
+    print(convertTimes(getDepartureTimes(getFeed(source,destination))))
     print("Destination arrival times")
-    print(convertTimes(getArrivalTimes(getFeed(source, destination))))
+    print(convertTimes(getArrivalTimes(feed)))
     print("Trip duration in minutes")
-    print(getDuration(getFeed(source, destination)))
+    print(getDuration(feed))
 
 
 def main():
