@@ -20,7 +20,7 @@ python lirr.py -s source -d destination
 
 Example
 ---
-python lirr.py -s penn -d hicks
+    python lirr.py -s penn -d hicks
 
     Source departure times
 
