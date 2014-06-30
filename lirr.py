@@ -128,8 +128,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Get Long Island Railroad departure, arrival and duration time."
     )
-    parser.add_argument('-source', metavar='-s', type=str, help='The train station you are starting your journey from (Autocomplete requires 3 characters ore more)' )
-    parser.add_argument('-destination', metavar='-d', type=str, help='The train station you are ending your journey (Autocomplete requires 3 characters ore more)')
+    parser.add_argument('-source', metavar='Source', type=str, help='The train station you are starting your journey from (Autocomplete requires 3 characters ore more)', required=True )
+    parser.add_argument('-destination', metavar='Destination', type=str, help='The train station you are ending your journey (Autocomplete requires 3 characters ore more)', required=True)
     options = parser.parse_args()
     if os.path.isfile('stations.txt'):
         if stationStringSizeCheck(options.source,options.destination) == True:
