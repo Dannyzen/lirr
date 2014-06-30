@@ -17,6 +17,7 @@ import ast
 import datetime
 import argparse
 import os.path
+from tabulate import tabulate
 
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
@@ -114,13 +115,12 @@ def convertTimes(times):
 
 
 def getTrainTimes(source,destination):
-    print("Source departure times")
-    print(convertTimes(getDepartureTimes(getFeed(source,destination))))
-    print("Destination arrival times")
-    print(convertTimes(getArrivalTimes(feed)))
-    print("Trip duration in minutes")
-    print(getDuration(feed))
-
+    headers = ["Source departure times", "Destination arrival times", "Trip duration in minutes"]
+    departures = convertTimes(getDepartureTimes(getFeed(source,destination)))
+    arrivals = convertTimes(getArrivalTimes(feed))
+    durations = getDuration(feed)
+    table = zip(departures, arrivals, durations)
+    print(tabulate(table, headers))
 
 def main():
     parser = argparse.ArgumentParser(
