@@ -20,7 +20,7 @@ python lirr.py -s source -d destination -a [optional] additional hours
 
 Example
 ---
-    run at 3:50pm: python lirr.py -s penn -d hicks -a -2
+    run at 3:50pm: python lirr.py -s penn -d hicks -a 2
 
     Source departure times    Destination arrival times      Trip duration in minutes
     ------------------------  ---------------------------  --------------------------
