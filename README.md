@@ -14,7 +14,7 @@ Installation
 
 Usage
 ---
-python lirr.py -s source -d destination
+python lirr.py -s source -d destination -a [optional] additional hours
 
 
 
