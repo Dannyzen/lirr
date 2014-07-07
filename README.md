@@ -9,7 +9,7 @@ LIRR.py obtains the 4 most recent train times given a source and destination.
 Installation
 ---
     git clone https://github.com/Dannyzen/lirr.git
-
+    pip install -r requirements.txt
 
 
 Usage
