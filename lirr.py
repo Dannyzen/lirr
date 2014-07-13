@@ -142,7 +142,7 @@ def main():
         try:
             writeStationList()
         except IOError:
-            print("Stations.txt does not exist, we tried to write it to this folder. We couldn't.")
+            print("Stations.txt does not exist, we tried to write it to this folder. We couldn't. Make sure this folder is writeable.")
             raise
         getTrainTimes(options.source,options.destination, options.additional_hour)
 
