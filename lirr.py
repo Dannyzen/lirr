@@ -11,6 +11,7 @@
 # Written by: @dannyzen & jcrivera
 
 from __future__ import print_function
+import docopt
 import urllib2
 import json
 import ast
@@ -18,6 +19,11 @@ import datetime
 import argparse
 import os.path
 from tabulate import tabulate
+
+USAGE = """
+usage: lirr.py [-h] -source Source -destination Destination
+               [-additional_hours hours]
+"""
 
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
@@ -127,7 +133,12 @@ def getTrainTimes(source,destination, additional_hour):
     table = zip(departures, arrivals, durations)
     print(tabulate(table, headers))
 
-def main():
+# lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
+
+# TODO:
+# 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Get Long Island Railroad departure, arrival and duration time."
     )
@@ -135,6 +146,7 @@ def main():
     parser.add_argument('-destination', metavar='Destination', type=str, help='The train station you are ending your journey (Autocomplete requires 3 characters ore more)', required=True)
     parser.add_argument('-additional_hour', metavar='Additional Hours', type=int, help='The additional hours in the future you want train times for', required=False, default=0)
     options = parser.parse_args()
+    print(options)
     if os.path.isfile('stations.txt'):
         if stationStringSizeCheck(options.source,options.destination) == True:
             getTrainTimes(options.source,options.destination,options.additional_hour)
@@ -145,13 +157,3 @@ def main():
             print("Stations.txt does not exist, we tried to write it to this folder. We couldn't. Make sure this folder is writeable.")
             raise
         getTrainTimes(options.source,options.destination, options.additional_hour)
-
-
-
-# lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
-
-# TODO:
-# 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
-
-if __name__ == "__main__":
-    main()
