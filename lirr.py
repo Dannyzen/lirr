@@ -30,6 +30,7 @@ import json
 import os.path
 import sys
 import urllib2
+from suffixarray import SuffixArray
 from tabulate import tabulate
 
 def loadStations():
@@ -51,8 +52,13 @@ def writeStationList():
                         writeToFile(stations)
 
 def getStationId(station):
-    # load stations in as a dict from stations.txt
-    # Ex: {"Penn Station":"NYK"}
+    """
+    load stations in as a dict from stations.txt
+    Ex: {"Penn Station":"NYK"}
+
+    Uses a suffix array implementation for fuzzy string matching
+    """
+    suffix_array = SuffixArray()
     stations = {}
     stations = ast.literal_eval(open('stations.txt').read())
     # lowercase all station names in stations
