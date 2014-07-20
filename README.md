@@ -29,3 +29,17 @@ Example
     06:01 PM                  06:45 PM                                             44
     06:08 PM                  06:59 PM                                             51
 
+
+Fuzzy String Matching
+---
+    (core-dev)[davidjarvis@ziz:lirr] 00:13:57 $ python lirr.py -s pens -d hicks
+
+    Couldn't autocomplete 'pens' - did you mean one of the following?
+    oceanside
+    hempstead gardens
+    country life press
+    speonk
+    glen street
+    queens village
+    penn station
+    kew gardens
