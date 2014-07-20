@@ -2,7 +2,7 @@
 """
 Get Long Island Railroad departure, arrival and duration times.
 
-Usage: python lirr.py (--source | -s) <source> (--dest | -d) <destination> [(--additional_hour | -a) <hours>]
+Usage: python lirr.py (--source | -s) <source> (--dest | -d) <destination> | (--favorite | -f) <favorite> [(--additional_hour | -a) <hours>]
 
 Arguments: 
     -source             The train station you are starting your journey from.
@@ -35,6 +35,14 @@ from tabulate import tabulate
 
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
+
+def loadFavorites(fave_number, additional_hours=0):
+    data = json.load(open('favorites.txt'))
+    favorites = {}
+    favorites['source'] = data[fave_number]["source"]
+    favorites['destination'] = data[fave_number]["destination"]
+    favorites['additional_hours'] = additional_hours
+    return favorites 
 
 # Writing
 def writeToFile(content,file_name="stations.txt"):
@@ -167,17 +175,22 @@ def getTrainTimes(source, destination, additional_hour):
     table = zip(departures, arrivals, durations)
     print(tabulate(table, headers))
 
-# lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
-
 # TODO:
 # 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
 
 if __name__ == "__main__":
     opts = docopt.docopt(__doc__, sys.argv)
     if os.path.isfile('stations.txt'):
-        if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
-            getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
-    else:
+        if opts['<favorite>']:
+            if os.path.isfile('favorites.txt'):
+                load_favorites(1)
+            else:
+                print("No favorites file loaded")
+                #TODO: Run favorite creation
+        else:
+            if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
+                getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
+else:
         try:
             writeStationList()
         except IOError:
