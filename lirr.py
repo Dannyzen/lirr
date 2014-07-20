@@ -80,6 +80,7 @@ def getStationId(station):
         results = suffix_array.get_fuzzy_search_results(station)
         if len(results) == 0:
             print("Tried to find the station. Couldn't. Blaming you.")
+            sys.exit()
         elif len(results) == 1:
             print("Assuming you meant to type '%s' when you wrote '%s'" % \
                     (list(results)[0], station), file=sys.stderr)
