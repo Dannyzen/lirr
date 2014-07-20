@@ -1,22 +1,35 @@
 #!/usr/bin/env python
-# Script fully supports use cases where source and destination are on the same train line
-# Get Long Island Railroad departure, arrival and duration time.
-# Usage: python lirr.py -s SOURCE -d DESTINATION -a Additional_Hour
-# Ex: python lirr.py -s penn -d babylon -3 
-# Output:
-# 4 most recent:
-#  departure times (if -a is not passed it uses current time. if -a is passed it will add to current hour)
-#  corresponding arrival times
-#  corresponding duration times
-# Written by: @dannyzen & jcrivera
+"""
+Get Long Island Railroad departure, arrival and duration times.
+
+Usage: python lirr.py (--source | -s) <source> (--dest | -d) <destination> [(--additional_hour | -a) <hours>]
+
+Arguments: 
+    -source             The train station you are starting your journey from.
+    -dest               The train station you are ending your journey
+    -additional_hour    The additional hours in the future you want train times for
+    
+Notes:
+    Autocompletion for -source and -dest requires 3 or more characters.
+
+Output:
+The 4 most recent:
+  - Departure times (if -a is not passed it uses current time. if -a is passed it will add to current hour)
+  - Corresponding arrival times
+  - Corresponding duration times
+
+Written by: dannyzen & jcrivera & venatius
+"""
 
 from __future__ import print_function
-import urllib2
-import json
+import argparse
 import ast
 import datetime
-import argparse
+import docopt
+import json
 import os.path
+import sys
+import urllib2
 from tabulate import tabulate
 
 def loadStations():
@@ -62,7 +75,7 @@ def stationStringSizeCheck(source, destination):
     else:
         return True
 
-def getFeed(source,destination,additional_hour):
+def getFeed(source, destination, additional_hour):
     if not source:
         print("source was fucked up")
     if not destination:
@@ -88,8 +101,10 @@ def getFeed(source,destination,additional_hour):
 # def check
 
 def getHour(additional_hour):
-    time = (datetime.datetime.time(datetime.datetime.now()).hour) + additional_hour
-    return str(time)
+    current_hour = (datetime.datetime.time(datetime.datetime.now()).hour)
+    if additional_hour:
+        current_hour += int(additional_hour)
+    return str(current_hour)
 
 def getDuration(feed):
     durations = []
@@ -118,35 +133,14 @@ def convertTimes(times):
     return new_times
 
 
-def getTrainTimes(source,destination, additional_hour):
+def getTrainTimes(source, destination, additional_hour):
     headers = ["Source departure times", "Destination arrival times", "Trip duration in minutes"]
-    feed = getFeed(source,destination,additional_hour)
+    feed = getFeed(source, destination, additional_hour)
     departures = convertTimes(getDepartureTimes(feed))
     arrivals = convertTimes(getArrivalTimes(feed))
     durations = getDuration(feed)
     table = zip(departures, arrivals, durations)
     print(tabulate(table, headers))
-
-def main():
-    parser = argparse.ArgumentParser(
-        description="Get Long Island Railroad departure, arrival and duration time."
-    )
-    parser.add_argument('-source', metavar='Source', type=str, help='The train station you are starting your journey from (Autocomplete requires 3 characters ore more)', required=True )
-    parser.add_argument('-destination', metavar='Destination', type=str, help='The train station you are ending your journey (Autocomplete requires 3 characters ore more)', required=True)
-    parser.add_argument('-additional_hour', metavar='Additional Hours', type=int, help='The additional hours in the future you want train times for', required=False, default=0)
-    options = parser.parse_args()
-    if os.path.isfile('stations.txt'):
-        if stationStringSizeCheck(options.source,options.destination) == True:
-            getTrainTimes(options.source,options.destination,options.additional_hour)
-    else:
-        try:
-            writeStationList()
-        except IOError:
-            print("Stations.txt does not exist, we tried to write it to this folder. We couldn't. Make sure this folder is writeable.")
-            raise
-        getTrainTimes(options.source,options.destination, options.additional_hour)
-
-
 
 # lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
 
@@ -154,4 +148,14 @@ def main():
 # 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
 
 if __name__ == "__main__":
-    main()
+    opts = docopt.docopt(__doc__, sys.argv)
+    if os.path.isfile('stations.txt'):
+        if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
+            getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
+    else:
+        try:
+            writeStationList()
+        except IOError:
+            print("Stations.txt does not exist, we tried to write it to this folder. We couldn't. Make sure this folder is writeable.")
+            raise
+        getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
