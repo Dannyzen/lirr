@@ -51,7 +51,7 @@ class SuffixArray(object):
             return array
         elif len(array) == 1:
             if difflib.SequenceMatcher(a=string, 
-                    b=array[0][:len(string)]).ratio() < 0.60:
+                    b=array[0][:len(string)]).ratio() < 0.70:
                 return []
             else:
                 return array

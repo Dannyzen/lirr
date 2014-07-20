@@ -51,27 +51,45 @@ def writeStationList():
                         stations.update({items["NAME"]:items["ABBR"]})
                         writeToFile(stations)
 
+def populateSuffixArray(keys):
+    """
+    Takes a list of keys and initializes and populates a 
+    suffixarray.SuffixArray object
+    """
+    suffix_array = SuffixArray()
+    for key in keys:
+        suffix_array.insert(key)
+    return suffix_array
+
 def getStationId(station):
     """
-    load stations in as a dict from stations.txt
+    Load stations in as a dict from stations.txt
     Ex: {"Penn Station":"NYK"}
 
     Uses a suffix array implementation for fuzzy string matching
     """
-    suffix_array = SuffixArray()
     stations = {}
     stations = ast.literal_eval(open('stations.txt').read())
     # lowercase all station names in stations
     stations = dict((k.lower(), v) for k, v in stations.iteritems())
-    # try to match the station to the dict's keys
-    # TODO: Need to do better catching for scenarios where:
-    #   1. Station matches multiple station names
-    #   2. Station is straight up wrong
-    try:
-        value = next(v for (k,v) in stations.iteritems() if station in k)
-        return(value)
-    except:
-        print("Tried to find the station. Couldn't. Blaming you.")
+    suffix_array = populateSuffixArray(stations.keys())
+    results = [v for (k, v) in stations.iteritems() if station in k]
+    if len(results) == 1:
+        return results[0]
+    else:
+        results = suffix_array.get_fuzzy_search_results(station)
+        if len(results) == 0:
+            print("Tried to find the station. Couldn't. Blaming you.")
+        elif len(results) == 1:
+            print("Assuming you meant to type '%s' when you wrote '%s'" % \
+                    (list(results)[0], station), file=sys.stderr)
+            return stations[list(results)[0]]
+        else:
+            print("Couldn't autocomplete '%s' - did you mean one of the following?" % \
+                    station, file=sys.stderr)
+            for potential_match in list(results):
+                print(potential_match, file=sys.stderr)
+            sys.exit()
 
 def stationStringSizeCheck(source, destination):
     if len(source) < 3:
