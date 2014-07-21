@@ -2,7 +2,7 @@
 """
 Get Long Island Railroad departure, arrival and duration times.
 
-Usage: python lirr.py (--source | -s) <source> (--dest | -d) <destination> | (--favorite | -f) <favorite> [(--additional_hour | -a) <hours>]
+Usage: python lirr.py  (--f <favorite> | --s <source> --d <destination>) [(--additional_hour | -a) <hours>]
 
 Arguments: 
     -source             The train station you are starting your journey from.
@@ -181,16 +181,27 @@ def getTrainTimes(source, destination, additional_hour):
 if __name__ == "__main__":
     opts = docopt.docopt(__doc__, sys.argv)
     if os.path.isfile('stations.txt'):
+        # If stations.txt exists
         if opts['<favorite>']:
+            #If a favorite option is passed
             if os.path.isfile('favorites.txt'):
-                load_favorites(1)
+                #If the favorites file exists
+                if opts['<hours>']:
+                    #If additional hours are passed
+                    loadFavorites(opts['<favorite>'], opts['<hours>'])
+                else:
+                    #If additional hours are not passed
+                    print(loadFavorites(opts['<favorite>']))
             else:
+                #If the favorites file does not exist
                 print("No favorites file loaded")
                 #TODO: Run favorite creation
         else:
+            #If favorite is not passed
             if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
                 getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
-else:
+    else:
+        #If stations.txt does not exist
         try:
             writeStationList()
         except IOError:
