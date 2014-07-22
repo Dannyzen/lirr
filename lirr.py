@@ -39,8 +39,8 @@ def loadStations():
 def loadFavorites(fave_number):
     data = json.load(open('favorites.json'))
     favorites = {}
-    favorites['source'] = data[fave_number]["source"]
-    favorites['destination'] = data[fave_number]["destination"]
+    favorites['source'] = data[int(fave_number)][str(fave_number)]["source"]
+    favorites['destination'] = data[int(fave_number)][str(fave_number)]["destination"]
     return favorites 
 
 # Writing
@@ -185,7 +185,7 @@ def getTrainTimes(source, destination, additional_hour):
     print(tabulate(table, headers))
 
 # TODO:
-# 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
+# Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
 
 if __name__ == "__main__":
     opts = docopt.docopt(__doc__, sys.argv)
