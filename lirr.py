@@ -36,12 +36,11 @@ from tabulate import tabulate
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
 
-def loadFavorites(fave_number, additional_hours=0):
+def loadFavorites(fave_number):
     data = json.load(open('favorites.txt'))
     favorites = {}
     favorites['source'] = data[fave_number]["source"]
     favorites['destination'] = data[fave_number]["destination"]
-    favorites['additional_hours'] = additional_hours
     return favorites 
 
 # Writing
@@ -58,6 +57,15 @@ def writeStationList():
                     if isinstance(items,dict):
                         stations.update({items["NAME"]:items["ABBR"]})
                         writeToFile(stations)
+
+def checkFavoriteFile(favorite_number):
+    #This should return true if a key already exists with the passed number
+
+def writeFavoriteFile(favorite_number):
+    #This should write a new favorites.txt if one does not exist
+
+def updateFavoriteFile(favorite_number):
+    #This may update a favorites.txt with the next value in line (ie, 1 exists, create 2)
 
 def populateSuffixArray(keys):
     """
@@ -112,7 +120,7 @@ def getFeed(source, destination, additional_hour):
     if not source:
         print("source was fucked up")
     if not destination:
-        print("destionat was fucked up")
+        print("destination was fucked up")
     # this is a very ugly function, It is a tragedy to humans. I don't care. It works.
     global feed
     feed = json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/TrainTime?startsta="
@@ -134,6 +142,7 @@ def getFeed(source, destination, additional_hour):
 # def check
 
 def getHour(additional_hour):
+    #TODO I reckon this is broken when you add more hours than there are left in the day...
     current_hour = (datetime.datetime.time(datetime.datetime.now()).hour)
     if additional_hour:
         current_hour += int(additional_hour)
@@ -186,18 +195,14 @@ if __name__ == "__main__":
             #If a favorite option is passed
             if os.path.isfile('favorites.txt'):
                 #If the favorites file exists
-                if opts['<hours>']:
-                    #If additional hours are passed
-                    loadFavorites(opts['<favorite>'], opts['<hours>'])
-                else:
-                    #If additional hours are not passed
-                    print(loadFavorites(opts['<favorite>']))
+                    favorites = loadFavorites(opts['<favorite>'])
+                    getTrainTimes(favorites["source"],favorites["destination"],opts["<hours>"])
             else:
-                #If the favorites file does not exist
-                print("No favorites file loaded")
-                #TODO: Run favorite creation
+                    #Favorite file does not exist, we need to make it
+                    #TODO Make favorite file
+                    print("No favorites file loaded")
         else:
-            #If favorite is not passed
+            #If favorite param is not passed
             if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
                 getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
     else:
