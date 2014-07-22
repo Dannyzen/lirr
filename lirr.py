@@ -2,7 +2,7 @@
 """
 Get Long Island Railroad departure, arrival and duration times.
 
-Usage: python lirr.py  (--f <favorite> | --s <source> --d <destination>) [(--additional_hour | -a) <hours>]
+Usage: python lirr.py  (-f <favorite> | -s <source> -d <destination>) [(--additional_hour | -a) <hours>]
 
 Arguments: 
     -source             The train station you are starting your journey from.
@@ -37,7 +37,7 @@ def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
 
 def loadFavorites(fave_number):
-    data = json.load(open('favorites.txt'))
+    data = json.load(open('favorites.json'))
     favorites = {}
     favorites['source'] = data[fave_number]["source"]
     favorites['destination'] = data[fave_number]["destination"]
@@ -58,14 +58,14 @@ def writeStationList():
                         stations.update({items["NAME"]:items["ABBR"]})
                         writeToFile(stations)
 
-def checkFavoriteFile(favorite_number):
-    #This should return true if a key already exists with the passed number
-
-def writeFavoriteFile(favorite_number):
-    #This should write a new favorites.txt if one does not exist
-
-def updateFavoriteFile(favorite_number):
-    #This may update a favorites.txt with the next value in line (ie, 1 exists, create 2)
+# def checkFavoriteFile(favorite_number):
+#     This should return true if a key already exists with the passed number
+# 
+# def writeFavoriteFile(favorite_number):
+#     This should write a new favorites.json if one does not exist
+# 
+# def updateFavoriteFile(favorite_number):
+#     This may update a favorites.json with the next value in line (ie, 1 exists, create 2)
 
 def populateSuffixArray(keys):
     """
@@ -193,7 +193,7 @@ if __name__ == "__main__":
         # If stations.txt exists
         if opts['<favorite>']:
             #If a favorite option is passed
-            if os.path.isfile('favorites.txt'):
+            if os.path.isfile('favorites.json'):
                 #If the favorites file exists
                     favorites = loadFavorites(opts['<favorite>'])
                     getTrainTimes(favorites["source"],favorites["destination"],opts["<hours>"])
