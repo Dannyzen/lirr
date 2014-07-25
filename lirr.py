@@ -71,14 +71,26 @@ def writeStationList():
                         stations.update({items["NAME"]:items["ABBR"]})
                         writeToFile(stations)
 
-# def checkFavoriteFile(favorite_number):
-#     This should return true if a key already exists with the passed number
-# 
-# def writeFavoriteFile(favorite_number):
-#     This should write a new favorites.json if one does not exist
-# 
-# def updateFavoriteFile(favorite_number):
-#     This may update a favorites.json with the next value in line (ie, 1 exists, create 2)
+"""
+def checkFavoriteFile(favorite_number):
+    This should return true if a key already exists with the passed number
+
+TODO: Figure out writing favorites.
+Writing
+def updateFavorites(source, destination):
+    data = loadFavorites()
+    position = len(data)
+    new_favorite = {i:{"source":source,"destination":destination}}
+    data.append(new_favorite)
+    with open('favorites.json', mode='w', encoding='utf-8') as favorites_json:
+        json.dump(data.append(new_favorite),favorties_json)
+
+def writeFavoriteFile(favorite_number):
+    initial writing of favorties.json
+    check if file exists
+    if not write it
+        handle issues writing
+"""
 
 def populateSuffixArray(keys):
     """
