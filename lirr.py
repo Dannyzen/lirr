@@ -2,7 +2,7 @@
 """
 Get Long Island Railroad departure, arrival and duration times.
 
-Usage: python lirr.py (--source | -s) <source> (--dest | -d) <destination> [(--additional_hour | -a) <hours>]
+Usage: python lirr.py  (-f <favorite> | -s <source> -d <destination>) [(--additional_hour | -a) <hours>]
 
 Arguments: 
     -source             The train station you are starting your journey from.
@@ -36,7 +36,27 @@ from tabulate import tabulate
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
 
+def getFavoriteByNumber(fave_number):
+    data = loadFavorites()
+    favorites = {}
+    favorites['source'] = data[int(fave_number)][str(fave_number)]["source"]
+    favorites['destination'] = data[int(fave_number)][str(fave_number)]["destination"]
+    return favorites
+
+def loadFavorites():
+    favorite_data = json.load(open('favorites.json'))
+    return favorite_data
+
+#TODO: Figure out writing favorites.
 # Writing
+# def writeFavorites(source, destination):
+#     data = loadFavorites()
+#     position = len(data)
+#     new_favorite = {i:{"source":source,"destination":destination}}
+#     data.append(new_favorite)
+#     with open('favorites.json', mode='w', encoding='utf-8') as favorites_json:
+#         json.dump(data.append(new_favorite),favorties_json)
+
 def writeToFile(content,file_name="stations.txt"):
     print(content,file=open(file_name,'w'))
 
@@ -50,6 +70,27 @@ def writeStationList():
                     if isinstance(items,dict):
                         stations.update({items["NAME"]:items["ABBR"]})
                         writeToFile(stations)
+
+"""
+def checkFavoriteFile(favorite_number):
+    This should return true if a key already exists with the passed number
+
+TODO: Figure out writing favorites.
+Writing
+def updateFavorites(source, destination):
+    data = loadFavorites()
+    position = len(data)
+    new_favorite = {i:{"source":source,"destination":destination}}
+    data.append(new_favorite)
+    with open('favorites.json', mode='w', encoding='utf-8') as favorites_json:
+        json.dump(data.append(new_favorite),favorties_json)
+
+def writeFavoriteFile(favorite_number):
+    initial writing of favorties.json
+    check if file exists
+    if not write it
+        handle issues writing
+"""
 
 def populateSuffixArray(keys):
     """
@@ -104,7 +145,7 @@ def getFeed(source, destination, additional_hour):
     if not source:
         print("source was fucked up")
     if not destination:
-        print("destionat was fucked up")
+        print("destination was fucked up")
     # this is a very ugly function, It is a tragedy to humans. I don't care. It works.
     global feed
     feed = json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/TrainTime?startsta="
@@ -126,6 +167,7 @@ def getFeed(source, destination, additional_hour):
 # def check
 
 def getHour(additional_hour):
+    #TODO I reckon this is broken when you add more hours than there are left in the day...
     current_hour = (datetime.datetime.time(datetime.datetime.now()).hour)
     if additional_hour:
         current_hour += int(additional_hour)
@@ -159,7 +201,7 @@ def convertTimes(times):
 
 
 def getTrainTimes(source, destination, additional_hour):
-    headers = ["Source departure times", "Destination arrival times", "Trip duration in minutes"]
+    headers = [source + " departure times", destination + " arrival times", "Trip duration in minutes"]
     feed = getFeed(source, destination, additional_hour)
     departures = convertTimes(getDepartureTimes(feed))
     arrivals = convertTimes(getArrivalTimes(feed))
@@ -167,17 +209,29 @@ def getTrainTimes(source, destination, additional_hour):
     table = zip(departures, arrivals, durations)
     print(tabulate(table, headers))
 
-# lirr/portal/api/TrainTime?startsta=NYK&endsta=HVL&year=2014&month=5&day=31&hour=18&minute=05&datoggle=d
-
 # TODO:
-# 1. Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
+# Figure out a way to support (or prevent) scenarios like: -s Hewlett -d Hicksville
 
 if __name__ == "__main__":
     opts = docopt.docopt(__doc__, sys.argv)
     if os.path.isfile('stations.txt'):
-        if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
-            getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
+        # If stations.txt exists
+        if opts['<favorite>']:
+            #If a favorite option is passed
+            if os.path.isfile('favorites.json'):
+                #If the favorites file exists
+                    favorites = getFavoriteByNumber(opts['<favorite>'])
+                    getTrainTimes(favorites["source"],favorites["destination"],opts["<hours>"])
+            else:
+                    #Favorite file does not exist, we need to make it
+                    #TODO Make favorite file
+                    print("No favorites file loaded")
+        else:
+            #If favorite param is not passed
+            if stationStringSizeCheck(opts['<source>'], opts['<destination>']) == True:
+                getTrainTimes(opts['<source>'], opts['<destination>'], opts['<hours>'])
     else:
+        #If stations.txt does not exist
         try:
             writeStationList()
         except IOError:
