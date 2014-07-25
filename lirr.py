@@ -36,14 +36,27 @@ from tabulate import tabulate
 def loadStations():
     return json.load(urllib2.urlopen("http://wx3.lirr.org/lirr/portal/api/Stations-All"))
 
-def loadFavorites(fave_number):
-    data = json.load(open('favorites.json'))
+def getFavoriteByNumber(fave_number):
+    data = loadFavorites()
     favorites = {}
     favorites['source'] = data[int(fave_number)][str(fave_number)]["source"]
     favorites['destination'] = data[int(fave_number)][str(fave_number)]["destination"]
-    return favorites 
+    return favorites
 
+def loadFavorites():
+    favorite_data = json.load(open('favorites.json'))
+    return favorite_data
+
+#TODO: Figure out writing favorites.
 # Writing
+# def writeFavorites(source, destination):
+#     data = loadFavorites()
+#     position = len(data)
+#     new_favorite = {i:{"source":source,"destination":destination}}
+#     data.append(new_favorite)
+#     with open('favorites.json', mode='w', encoding='utf-8') as favorites_json:
+#         json.dump(data.append(new_favorite),favorties_json)
+
 def writeToFile(content,file_name="stations.txt"):
     print(content,file=open(file_name,'w'))
 
@@ -195,7 +208,7 @@ if __name__ == "__main__":
             #If a favorite option is passed
             if os.path.isfile('favorites.json'):
                 #If the favorites file exists
-                    favorites = loadFavorites(opts['<favorite>'])
+                    favorites = getFavoriteByNumber(opts['<favorite>'])
                     getTrainTimes(favorites["source"],favorites["destination"],opts["<hours>"])
             else:
                     #Favorite file does not exist, we need to make it
