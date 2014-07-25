@@ -176,7 +176,7 @@ def convertTimes(times):
 
 
 def getTrainTimes(source, destination, additional_hour):
-    headers = ["Source departure times", "Destination arrival times", "Trip duration in minutes"]
+    headers = [source + " departure times", destination + " arrival times", "Trip duration in minutes"]
     feed = getFeed(source, destination, additional_hour)
     departures = convertTimes(getDepartureTimes(feed))
     arrivals = convertTimes(getArrivalTimes(feed))
