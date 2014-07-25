@@ -1,12 +1,12 @@
 [
     {
-        "1": {
+        "0": {
             "destination": "hicksville",
             "source": "penn"
         }
     },
     {
-        "2": {
+        "1": {
             "destination": "penn",
             "source": "hicksville"
         }
