@@ -22,7 +22,6 @@ Written by: dannyzen & jcrivera & venatius
 """
 
 from __future__ import print_function
-import argparse
 import ast
 import datetime
 import docopt
